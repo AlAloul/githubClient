@@ -1,5 +1,5 @@
 exports.search = function(sType){
-    var win = Ti.UI.createWindow({backgroundColor:'#000'});
+    var win = Ti.UI.createWindow({backgroundColor:'#fff', navBarHidden: true, modal:true});
     
 	//Custom Nav Bar
 	var navBar = Titanium.UI.createView({
@@ -11,6 +11,18 @@ exports.search = function(sType){
 	});
 	win.add(navBar);
 
+	var backBtn = Titanium.UI.createButton({
+		backgroundImage: 'images/back_btn.png',
+		width: 51,
+		height: 30,
+		left: 10
+	});
+	navBar.add(backBtn);
+
+	backBtn.addEventListener('click', function (e) {
+		win.close();
+	});
+	
 	var navTitle = Ti.UI.createLabel({
 		text: sType+" Search",
 		textAlign:'center',
@@ -36,7 +48,7 @@ exports.search = function(sType){
 	win.add(inputField);
 
 	var searchBtn = Titanium.UI.createButton({
-		color:'blue',
+		color:'#000',
 		title:'Search',
 		width:200,
 		height:40,
@@ -44,9 +56,53 @@ exports.search = function(sType){
 	});
 	win.add(searchBtn); 
 	
+	var searchRepos = function(arg) {
+		if(Titanium.Network.online) {
+				// Create our HTTP Client and name it "loader"
+				var loader = Titanium.Network.createHTTPClient();
+				// Sets the HTTP request method, and the URL to get data from
+				loader.open("GET", arg.requestUrl);
+			 
+				// Runs the function when the data is ready for us to process
+				loader.onload = function() 
+				{  
+					searchBtn.title  = "Search";
+					searchBtn.enabled = true;
+				    var response = this.responseText;
+				    require('repoListing').repoListing(response).open();
+				};
+				
+			    loader.onerror = function(e) {
+					 searchBtn.title  = "Search";
+					 searchBtn.enabled = true;
+			         alert('Unable to connect to server');
+			    };
+			     
+			    loader.timeout = 5000;  /* in milliseconds */
+				
+				// Send the HTTP request
+				loader.send();
+		}else{
+			alert('Please check your Internet Connection');    
+		}
+	};
+
+	var searchUsers = function(arg) {
+	  
+	};
+	
 	searchBtn.addEventListener('click', function (e) {
+		inputField.blur();
 		if(inputField.value){
 			alert(inputField.value);
+			searchBtn.title  = "Searching...";
+			searchBtn.enabled = false;
+			var rUrl = "https://api.github.com/legacy/repos/search/"+inputField.value;
+			if(sType == "Repo"){
+				searchRepos({requestUrl:rUrl});
+			}else{
+				searchUsers({})
+			}
 		}else{
 			alert("Please enter valid "+sType+" name");
 		}

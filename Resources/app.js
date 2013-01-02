@@ -4,7 +4,8 @@ Titanium.UI.setBackgroundColor('#000');
 var search = require('search');
 
 var win = Titanium.UI.createWindow({
-	backgroundColor : '#fff'
+	backgroundColor : '#fff',
+	navBarHidden: true
 });
 
 //Custom Nav Bar
