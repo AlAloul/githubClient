@@ -56,7 +56,7 @@ exports.search = function(sType){
 	});
 	win.add(searchBtn); 
 	
-	var searchRepos = function(arg) {
+	var doSearch = function(arg) {
 		if(Titanium.Network.online) {
 				// Create our HTTP Client and name it "loader"
 				var loader = Titanium.Network.createHTTPClient();
@@ -97,11 +97,16 @@ exports.search = function(sType){
 			alert(inputField.value);
 			searchBtn.title  = "Searching...";
 			searchBtn.enabled = false;
-			var rUrl = "https://api.github.com/legacy/repos/search/"+inputField.value;
 			if(sType == "Repo"){
-				searchRepos({requestUrl:rUrl});
+				var rUrl = "https://api.github.com/legacy/repos/search/"+inputField.value;
+				//doSearch({requestUrl:rUrl});
+				var response = null;
+				require('repoListing').repoListing(response).open();
 			}else{
-				searchUsers({})
+				var rUrl = "https://api.github.com/legacy/user/search/"+inputField.value;
+				//doSearch({requestUrl:rUrl});
+				var response = null;
+				require('userListing').userListing(response).open();
 			}
 		}else{
 			alert("Please enter valid "+sType+" name");
